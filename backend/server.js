@@ -12,6 +12,7 @@ const aiRoutes = require('./routes/ai');
 const analyticsRoutes = require('./routes/analytics');
 const announcementRoutes = require('./routes/announcements');
 const userRoutes = require('./routes/users');
+const answerQueueRoutes = require('./routes/answerQueue');
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/answer-queue', answerQueueRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
