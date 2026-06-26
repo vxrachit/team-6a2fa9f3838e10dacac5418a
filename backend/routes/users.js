@@ -23,9 +23,13 @@ router.patch('/profile', protect, async (req, res) => {
     if (college) update.college = college;
     if (batch) update.batch = batch;
     if (preferences) update.preferences = { ...req.user.preferences, ...preferences };
-    const user = await User.findByIdAndUpdate(req.user._id, update, { new: true });
+    const user = await User.findByIdAndUpdate(req.user._id, update, { new: true, runValidators: true });
     res.json({ user });
   } catch (err) {
+    if (err.name === 'ValidationError') {
+      const msg = Object.values(err.errors).map(e => e.message).join(', ');
+      return res.status(400).json({ error: msg });
+    }
     res.status(400).json({ error: err.message });
   }
 });

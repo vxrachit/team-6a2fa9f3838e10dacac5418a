@@ -8,7 +8,21 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Name is required'],
     trim: true,
     minlength: 2,
-    maxlength: 50
+    maxlength: 50,
+    validate: [
+      {
+        validator: function(val) {
+          return !/^\d/.test(val);
+        },
+        message: 'Name cannot start with a number'
+      },
+      {
+        validator: function(val) {
+          return !/^\d+$/.test(val.replace(/\s/g, ''));
+        },
+        message: 'Name cannot contain only numbers'
+      }
+    ]
   },
   email: {
     type: String,
@@ -20,7 +34,21 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Password is required'],
-    minlength: 6,
+    validate: {
+      validator: function(val) {
+        if (typeof this.isModified === 'function' && !this.isModified('password')) {
+          return true;
+        }
+        return validator.isStrongPassword(val, {
+          minLength: 8,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 1
+        });
+      },
+      message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+    },
     select: false
   },
   role: {

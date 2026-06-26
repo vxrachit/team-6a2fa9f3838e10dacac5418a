@@ -36,6 +36,19 @@ export default function Profile() {
   };
 
   const handleSaveProfile = async () => {
+    if (!formData.name?.trim()) {
+      toast.error('Name is required');
+      return;
+    }
+    if (/^\d/.test(formData.name)) {
+      toast.error('Name cannot start with a number');
+      return;
+    }
+    if (/^\d+$/.test(formData.name.replace(/\s/g, ''))) {
+      toast.error('Name cannot contain only numbers');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const res = await api.patch('/users/profile', formData);
