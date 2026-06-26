@@ -70,15 +70,50 @@ export const useAuthStore = create(
 export const useThemeStore = create(
   persist(
     (set, get) => ({
-      theme: 'dark',
+      theme: 'system',
+      setTheme: (t) => {
+        let actualTheme = t;
+        if (t === 'system') {
+          actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        set({ theme: t });
+        document.body.classList.toggle('light', actualTheme === 'light');
+      },
       toggleTheme: () => {
-        const next = get().theme === 'dark' ? 'light' : 'dark';
-        set({ theme: next });
-        document.body.classList.toggle('light', next === 'light');
+        const current = get().theme;
+        let next;
+        if (current === 'system') {
+          const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          next = isSystemDark ? 'light' : 'dark';
+        } else {
+          next = current === 'dark' ? 'light' : 'dark';
+        }
+        
+        get().setTheme(next);
+        
+        // Sync with backend if user is logged in
+        const { user, updatePreferences } = useAuthStore.getState();
+        if (user) {
+          updatePreferences({ ...user.preferences, theme: next });
+        }
       },
       initTheme: () => {
-        const { theme } = get();
-        document.body.classList.toggle('light', theme === 'light');
+        const { theme, setTheme } = get();
+        setTheme(theme);
+        
+        // Listen to system theme changes
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handler = () => {
+          if (get().theme === 'system') {
+            setTheme('system');
+          }
+        };
+        
+        if (mediaQuery.addEventListener) {
+          mediaQuery.addEventListener('change', handler);
+        } else {
+          mediaQuery.addListener(handler);
+        }
       }
     }),
     { name: 'vins-theme' }

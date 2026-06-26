@@ -13,6 +13,8 @@ export default function Settings() {
     notifications: true
   });
 
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
   useEffect(() => {
     if (user?.preferences) {
       setPreferences(user.preferences);
@@ -33,10 +35,6 @@ export default function Settings() {
     }
   };
 
-  const handleThemeToggle = () => {
-    toggleTheme();
-    handlePreferenceChange('theme', theme === 'dark' ? 'light' : 'dark');
-  };
 
   return (
     <div className="min-h-screen p-6 md:p-12">
@@ -60,15 +58,15 @@ export default function Settings() {
                   <p className="text-sm text-slate-400 mt-1">Toggle between light and dark themes</p>
                 </div>
                 <button
-                  onClick={handleThemeToggle}
+                  onClick={toggleTheme}
                   disabled={isLoading}
                   className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    theme === 'dark' ? 'bg-purple-600' : 'bg-slate-600'
+                    isDark ? 'bg-purple-600' : 'bg-slate-600'
                   } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                 >
                   <span
                     className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      theme === 'dark' ? 'translate-x-1' : 'translate-x-7'
+                      isDark ? 'translate-x-7' : 'translate-x-1'
                     }`}
                   />
                 </button>

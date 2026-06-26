@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useEffect } from 'react'
-import { useAuthStore } from './store'
+import { useAuthStore, useThemeStore } from './store'
 import Layout from './components/layout/Layout'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
@@ -27,6 +27,15 @@ function PublicRoute({ children }) {
 }
 
 export default function App() {
+  const user = useAuthStore(state => state.user)
+  const setTheme = useThemeStore(state => state.setTheme)
+
+  useEffect(() => {
+    if (user?.preferences?.theme) {
+      setTheme(user.preferences.theme)
+    }
+  }, [user?.preferences?.theme, setTheme])
+
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
