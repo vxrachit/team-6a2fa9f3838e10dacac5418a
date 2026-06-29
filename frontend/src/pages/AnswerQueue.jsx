@@ -63,6 +63,15 @@ function QuestionCard({ question }) {
         </span>
       </div>
       <p className="text-slate-200 text-sm leading-relaxed mb-3">{question.text}</p>
+      {question.images && question.images.length > 0 && (
+        <div className="flex flex-wrap gap-3 mb-3">
+          {question.images.map((img, idx) => (
+            <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="relative group overflow-hidden rounded-xl border border-dark-500 bg-dark-800 hover:border-blue-500/30 transition-all max-w-[200px]" title="View full image">
+              <img src={img} alt={`Question screenshot ${idx + 1}`} className="max-h-28 object-contain p-1 group-hover:scale-102 transition-transform" />
+            </a>
+          ))}
+        </div>
+      )}
       <div className="flex flex-wrap gap-1.5">
         {(question.tags || []).map(t => (
           <span key={t} className="text-xs text-slate-600 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>

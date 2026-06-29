@@ -67,18 +67,31 @@ router.get('/:id', optionalAuth, async (req, res) => {
 // POST /api/queries - Create new query
 router.post('/', protect, async (req, res) => {
   try {
-    const { title, content, category, tags, refinedTitle } = req.body;
+    const { title, content, category, tags, refinedTitle, images } = req.body;
     if (!title || !content || !category) return res.status(400).json({ error: 'Title, content and category are required.' });
 
     // Auto-generate AI answer for the new query
-    const query = await Query.create({ title, content, category, tags: tags || [], refinedTitle, author: req.user._id });
+    const query = await Query.create({ title, content, category, tags: tags || [], refinedTitle, images: images || [], author: req.user._id });
 
     // Generate AI answer async
     try {
+      let imageParam = null;
+      if (images && images.length > 0) {
+        const img = images[0];
+        const match = img.match(/^data:(image\/[a-zA-Z+-\.]+);base64,(.+)$/);
+        if (match) {
+          imageParam = {
+            mimeType: match[1],
+            data: match[2]
+          };
+        }
+      }
+
       const aiResult = await processRAGQuery(title + ' ' + content, {
         explainMode: req.user.preferences?.explainMode || 'intermediate',
         userId: req.user._id,
-        queryId: query._id
+        queryId: query._id,
+        image: imageParam
       });
 
       // Find related FAQs

@@ -15,6 +15,7 @@ import Announcements from './pages/Announcements'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import FAQBrowser from './pages/FAQBrowser'
+import UploadPhotos from './pages/UploadPhotos'
 
 function ProtectedRoute({ children }) {
   const token = useAuthStore(state => state.token)
@@ -65,6 +66,7 @@ export default function App() {
       >
         <Route path="home" element={<Home />} />
         <Route path="ask" element={<AskAI />} />
+        <Route path="upload-photos" element={<UploadPhotos />} />
         <Route path="raise-query" element={<RaiseQuery />} />
         <Route path="discussions" element={<Discussions />} />
         <Route path="discussions/:id" element={<QueryDetail />} />

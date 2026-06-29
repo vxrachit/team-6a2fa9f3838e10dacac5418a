@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain, Send, ChevronDown, ChevronUp, Sparkles, BookOpen, ArrowUpRight,
   ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle, Info, Zap, Copy, RotateCcw,
-  Mic, MicOff, Volume2, VolumeX
+  Mic, MicOff, Volume2, VolumeX, Image as ImageIcon, X
 } from 'lucide-react'
 import { useAuthStore } from '../store'
 import api from '../utils/api'
@@ -128,10 +128,39 @@ export default function AskAI() {
   const [feedback, setFeedback] = useState({})
   const [isListening, setIsListening] = useState(false)
   const [isPlayingTTS, setIsPlayingTTS] = useState(false)
+  const [image, setImage] = useState(null)
   const textRef = useRef(null)
   const resultRef = useRef(null)
   const recognitionRef = useRef(null)
+  const fileInputRef = useRef(null)
   const startText = useRef('')
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file')
+      return
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error('Image size must be under 4MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImage({
+        data: reader.result.split(',')[1],
+        mimeType: file.type,
+        preview: reader.result
+      })
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const clearImage = () => {
+    setImage(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
@@ -169,12 +198,12 @@ export default function AskAI() {
     }
 
     const query = (q || question).trim()
-    if (!query || loading) {
-      if (!query) toast.error('Please enter a question')
+    if (!query && !image && !loading) {
+      if (!query && !image) toast.error('Please enter a question or upload a photo')
       return
     }
 
-    if (query.length < 3) {
+    if (!image && query.length < 3) {
       toast.error('Question must be at least 3 characters')
       return
     }
@@ -182,11 +211,16 @@ export default function AskAI() {
     setLoading(true)
     setResult(null)
     try {
-      console.log('📡 Asking AI:', { question: query, explainMode })
-      const res = await api.post('/ai/ask', { question: query, explainMode })
+      console.log('📡 Asking AI:', { question: query, explainMode, hasImage: !!image })
+      const payload = { question: query, explainMode }
+      if (image) {
+        payload.image = { data: image.data, mimeType: image.mimeType }
+      }
+      const res = await api.post('/ai/ask', payload)
       console.log('✅ AI Response:', res.data)
       setResult({ ...res.data, question: query })
       setHistory(h => [{ question: query, result: res.data }, ...h.slice(0, 9)])
+      clearImage()
     } catch (err) {
       console.error('❌ AI Error:', err.response?.data || err.message)
       const errorMsg = err.response?.data?.error || err.message || 'AI service unavailable. Please try again.'
@@ -347,11 +381,26 @@ export default function AskAI() {
         </div>
 
         <div className="relative">
+          {image && (
+            <div className="relative inline-block mb-3 rounded-lg overflow-hidden border border-dark-500 bg-dark-700 p-1">
+              <img src={image.preview} alt="Upload preview" className="max-h-24 object-cover rounded" />
+              <button onClick={clearImage} className="absolute top-2 right-2 p-1.5 bg-red-600/90 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg" title="Remove image">
+                <X size={10} />
+              </button>
+            </div>
+          )}
+
           <textarea ref={textRef} value={question}
             onChange={e => setQuestion(e.target.value)} onKeyDown={handleKeyDown}
             placeholder="Ask about NOC, ViBe issues, Rosetta, team formation, offer letter... (Ctrl+Enter to send)"
-            className="input-dark min-h-[100px] resize-none pr-24 text-base" rows={3} />
+            className="input-dark min-h-[100px] resize-none pr-32 text-base" rows={3} />
           <div className="absolute bottom-3 right-3 flex items-center gap-2">
+            <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+            <button onClick={() => fileInputRef.current?.click()}
+              className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all bg-dark-600 hover:bg-dark-500 text-slate-300 border border-dark-500 hover:border-dark-400 hover:shadow-lg hover:shadow-blue-500/10 ${image ? 'text-violet-400 border-violet-500/30' : ''}`}
+              title="Attach screenshot">
+              <ImageIcon size={16} />
+            </button>
             <button onClick={toggleListening}
               className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
                 isListening
@@ -361,7 +410,7 @@ export default function AskAI() {
               title={isListening ? "Stop listening" : "Ask by voice"}>
               {isListening ? <MicOff size={16} /> : <Mic size={16} />}
             </button>
-            <button onClick={() => handleAsk()} disabled={loading || !question.trim() || isListening}
+            <button onClick={() => handleAsk()} disabled={loading || (!question.trim() && !image) || isListening}
               className="w-9 h-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all hover:shadow-lg hover:shadow-blue-500/25">
               <Send size={16} className="text-white" />
             </button>

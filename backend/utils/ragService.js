@@ -1,8 +1,17 @@
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const FAQ = require('../models/FAQ');
 const { Analytics } = require('../models/Analytics');
 
 const GROQ_MODEL = 'openai/gpt-oss-120b';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+let genAI;
+function getGenAI() {
+  if (!genAI && process.env.GEMINI_API_KEY) {
+    genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  }
+  return genAI;
+}
 
 function getGroqApiKey() {
   return process.env.GROQ_API_KEY || '';
@@ -171,13 +180,48 @@ RESPONSE FORMAT (STRICTLY USE MARKDOWN):
 - Follow-ups: "You might also want to know: ..."`;
 }
 
+// Extract a searchable text query from an image and user description
+async function extractQueryFromImage(image, userDescription) {
+  const ai = getGenAI();
+  if (!ai) return userDescription || "problem shown in the image";
+  try {
+    const model = ai.getGenerativeModel({ model: 'gemini-flash-latest' });
+    const prompt = `Analyze this image and description of an internship issue. 
+User description: "${userDescription || 'Not provided'}"
+
+Generate a search query of 1-3 sentences describing the exact error, technical issue, system state, or question shown in the image. Use specific terms where applicable (e.g. NOC, ViBe, Rosetta, offer letter, etc.).
+Return ONLY the search query, nothing else.`;
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: image.data,
+          mimeType: image.mimeType
+        }
+      }
+    ]);
+    return result.response.text().trim();
+  } catch (err) {
+    console.error("Failed to extract query from image:", err);
+    return userDescription || "problem shown in the image";
+  }
+}
+
 // Main RAG query function
 async function processRAGQuery(question, options = {}) {
-  const { explainMode = 'intermediate', userId = null, queryId = null } = options;
+  const { explainMode = 'intermediate', userId = null, queryId = null, image = null } = options;
 
   try {
+    let searchQuestion = question;
+    if (image && image.data) {
+      const extractedQuery = await extractQueryFromImage(image, question);
+      searchQuestion = question ? `${question} ${extractedQuery}` : extractedQuery;
+      console.log('📷 Image query extracted:', extractedQuery);
+    }
+
     // Step 1: Retrieve relevant FAQs
-    const scoredFAQs = await retrieveRelevantFAQs(question, 5);
+    const scoredFAQs = await retrieveRelevantFAQs(searchQuestion || "problem shown in the image", 5);
 
     // Step 2: Calculate confidence
     const confidence = calculateConfidence(scoredFAQs);
@@ -201,14 +245,70 @@ async function processRAGQuery(question, options = {}) {
     let followUpSuggestions = [];
 
     const groqApiKey = getGroqApiKey();
-    if (groqApiKey && faqContext) {
+    const ai = getGenAI();
+
+    // If we have an image, we MUST use Gemini
+    if (image && image.data && ai && faqContext) {
+      try {
+        const model = ai.getGenerativeModel({ model: 'gemini-flash-latest' });
+        const prompt = `${buildSystemPrompt(explainMode)}
+
+FAQ CONTEXT (use ONLY this to answer):
+${faqContext}
+
+Student question/description: "${question || 'Please see the attached image.'}"
+
+${escalationRequired ? 'NOTE: Confidence is low. Acknowledge limitations and recommend escalation.' : ''}
+
+Respond with a JSON object:
+{
+  "answer": "your detailed answer here",
+  "followUps": ["follow up question 1", "follow up question 2", "follow up question 3"],
+  "escalationMessage": "reason for escalation if needed or null"
+}`;
+
+        const result = await model.generateContent([
+          prompt,
+          {
+            inlineData: {
+              data: image.data,
+              mimeType: image.mimeType
+            }
+          }
+        ]);
+        const text = result.response.text();
+
+        // Parse JSON response
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          aiContent = parsed.answer || text;
+          followUpSuggestions = parsed.followUps || [];
+        } else {
+          aiContent = text;
+        }
+      } catch (geminiError) {
+        console.error('Gemini multimodal error:', geminiError.message);
+        // Fallback: use best FAQ answer directly
+        if (scoredFAQs.length > 0) {
+          aiContent = `Based on the FAQ (${scoredFAQs[0].faq.sectionId ? `§${scoredFAQs[0].faq.sectionId}` : scoredFAQs[0].faq.category}):\n\n${scoredFAQs[0].faq.answer}`;
+          followUpSuggestions = [
+            'Is there anything else about this topic?',
+            'Do you need clarification on any point?',
+            'Would you like to escalate this to a mentor?'
+          ];
+        } else {
+          aiContent = 'I could not find relevant information in the FAQ knowledge base. Please escalate to a mentor via Yaksha.';
+        }
+      }
+    } else if (groqApiKey && faqContext) {
       try {
         const prompt = `${buildSystemPrompt(explainMode)}
 
 FAQ CONTEXT (use ONLY this to answer):
 ${faqContext}
 
-Student question: "${question}"
+Student question/description: "${question || 'Please see the attached image.'}"
 
 ${escalationRequired ? 'NOTE: Confidence is low. Acknowledge limitations and recommend escalation.' : ''}
 
@@ -234,23 +334,105 @@ Respond with a JSON object:
       } catch (groqError) {
         const logMethod = isTransientGroqError(groqError) ? 'warn' : 'error';
         console[logMethod]('Groq error:', groqError.message);
-        console.log('Response NOT generated by Groq API (fallback to FAQ used due to error)');
-        // Fallback: use best FAQ answer directly
-        if (scoredFAQs.length > 0) {
-          aiContent = `Based on the FAQ (${scoredFAQs[0].faq.sectionId ? `§${scoredFAQs[0].faq.sectionId}` : scoredFAQs[0].faq.category}):\n\n${scoredFAQs[0].faq.answer}`;
-          followUpSuggestions = [
-            'Is there anything else about this topic?',
-            'Do you need clarification on any point?',
-            'Would you like to escalate this to a mentor?'
-          ];
+        
+        // If Groq fails but Gemini is available, try fallback to Gemini
+        if (ai) {
+          console.log('Falling back to Gemini...');
+          try {
+            const model = ai.getGenerativeModel({ model: 'gemini-flash-latest' });
+            const prompt = `${buildSystemPrompt(explainMode)}
+
+FAQ CONTEXT (use ONLY this to answer):
+${faqContext}
+
+Student question/description: "${question || 'Please see the attached image.'}"
+
+${escalationRequired ? 'NOTE: Confidence is low. Acknowledge limitations and recommend escalation.' : ''}
+
+Respond with a JSON object:
+{
+  "answer": "your detailed answer here",
+  "followUps": ["follow up question 1", "follow up question 2", "follow up question 3"],
+  "escalationMessage": "reason for escalation if needed or null"
+}`;
+            const result = await model.generateContent(prompt);
+            const text = result.response.text();
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              const parsed = JSON.parse(jsonMatch[0]);
+              aiContent = parsed.answer || text;
+              followUpSuggestions = parsed.followUps || [];
+            } else {
+              aiContent = text;
+            }
+            console.log('Response generated by Gemini fallback');
+          } catch (geminiError) {
+            console.error('Gemini fallback error:', geminiError.message);
+            if (scoredFAQs.length > 0) {
+              aiContent = `Based on the FAQ (${scoredFAQs[0].faq.sectionId ? `§${scoredFAQs[0].faq.sectionId}` : scoredFAQs[0].faq.category}):\n\n${scoredFAQs[0].faq.answer}`;
+              followUpSuggestions = [
+                'Is there anything else about this topic?',
+                'Do you need clarification on any point?',
+                'Would you like to escalate this to a mentor?'
+              ];
+            } else {
+              aiContent = 'I could not find relevant information in the FAQ knowledge base. Please escalate to a mentor via Yaksha.';
+            }
+          }
         } else {
-          aiContent = 'I could not find relevant information in the FAQ knowledge base. Please escalate to a mentor via Yaksha.';
+          console.log('Response NOT generated by Groq API (fallback to FAQ used due to error)');
+          if (scoredFAQs.length > 0) {
+            aiContent = `Based on the FAQ (${scoredFAQs[0].faq.sectionId ? `§${scoredFAQs[0].faq.sectionId}` : scoredFAQs[0].faq.category}):\n\n${scoredFAQs[0].faq.answer}`;
+            followUpSuggestions = [
+              'Is there anything else about this topic?',
+              'Do you need clarification on any point?',
+              'Would you like to escalate this to a mentor?'
+            ];
+          } else {
+            aiContent = 'I could not find relevant information in the FAQ knowledge base. Please escalate to a mentor via Yaksha.';
+          }
         }
       }
-    } else if (!groqApiKey) {
-      // No valid API key - use FAQ directly
-      console.warn('GROQ_API_KEY not configured. Using FAQ fallback.');
-      console.log('Response NOT generated by Groq API (No API key, fallback to FAQ used)');
+    } else if (ai && faqContext) {
+      // If Groq is not configured but Gemini is, use Gemini
+      try {
+        const model = ai.getGenerativeModel({ model: 'gemini-flash-latest' });
+        const prompt = `${buildSystemPrompt(explainMode)}
+
+FAQ CONTEXT (use ONLY this to answer):
+${faqContext}
+
+Student question/description: "${question || 'Please see the attached image.'}"
+
+${escalationRequired ? 'NOTE: Confidence is low. Acknowledge limitations and recommend escalation.' : ''}
+
+Respond with a JSON object:
+{
+  "answer": "your detailed answer here",
+  "followUps": ["follow up question 1", "follow up question 2", "follow up question 3"],
+  "escalationMessage": "reason for escalation if needed or null"
+}`;
+        const result = await model.generateContent(prompt);
+        const text = result.response.text();
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          aiContent = parsed.answer || text;
+          followUpSuggestions = parsed.followUps || [];
+        } else {
+          aiContent = text;
+        }
+        console.log('Response generated by Gemini (Groq not configured)');
+      } catch (geminiError) {
+        console.error('Gemini error:', geminiError.message);
+        if (scoredFAQs.length > 0) {
+          aiContent = `📌 Based on FAQ ${scoredFAQs[0].faq.sectionId ? `§${scoredFAQs[0].faq.sectionId}` : `(${scoredFAQs[0].faq.category})`}:\n\n${scoredFAQs[0].faq.answer}`;
+          followUpSuggestions = [ 'Need more details?', 'Ask another question', 'Escalate to mentor' ];
+        } else {
+          aiContent = '❌ No relevant FAQs found for your question.';
+        }
+      }
+    } else {
       if (scoredFAQs.length > 0) {
         aiContent = `📌 Based on FAQ ${scoredFAQs[0].faq.sectionId ? `§${scoredFAQs[0].faq.sectionId}` : `(${scoredFAQs[0].faq.category})`}:\n\n${scoredFAQs[0].faq.answer}`;
         if (scoredFAQs.length > 1) {
@@ -264,11 +446,6 @@ Respond with a JSON object:
       } else {
         aiContent = '❌ No relevant FAQs found for your question.\n\nPlease:\n1. Check the FAQ browser\n2. Ask in discussions\n3. Escalate to a mentor in Yaksha';
       }
-    } else if (scoredFAQs.length > 0) {
-      // AI disabled but FAQs available
-      aiContent = `Based on the FAQ:\n\n${scoredFAQs[0].faq.answer}`;
-    } else {
-      aiContent = 'No relevant information found. Please escalate to a mentor.';
     }
 
     // Step 7: Log analytics

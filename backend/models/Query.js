@@ -58,6 +58,7 @@ const querySchema = new mongoose.Schema({
   resolvedAt: Date,
   // Refined question from AI
   refinedTitle: String,
+  images: [String],
   searchVector: { type: Map, of: Number },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }

@@ -4,13 +4,14 @@ import { useAuthStore, useThemeStore, useUIStore } from '../../store'
 import {
   Brain, Home, MessageSquarePlus, MessagesSquare, BarChart3,
   Bell, User, Settings, BookOpen, LogOut, Menu, X, Sun, Moon,
-  ChevronRight, Zap, Shield
+  ChevronRight, Zap, Shield, Image as ImageIcon
 } from 'lucide-react'
 import { useState } from 'react'
 
 const navItems = [
   { to: '/home', icon: Home, label: 'Home', desc: 'AI Intelligence Hub' },
   { to: '/ask', icon: Brain, label: 'Ask AI', desc: 'RAG-powered answers' },
+  { to: '/upload-photos', icon: ImageIcon, label: 'Upload Photos', desc: 'Ask FAQs with screenshots' },
   { to: '/raise-query', icon: MessageSquarePlus, label: 'Raise Query', desc: 'Post a question' },
   { to: '/discussions', icon: MessagesSquare, label: 'Discussions', desc: 'Community Q&A' },
   { to: '/faq', icon: BookOpen, label: 'FAQ Browser', desc: 'Browse knowledge base' },

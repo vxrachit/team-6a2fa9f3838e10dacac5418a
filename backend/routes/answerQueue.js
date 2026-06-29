@@ -115,6 +115,7 @@ router.post('/pull', protect, async (req, res) => {
         stepLabel: question.category,
         createdAt: question.createdAt,
         tags: question.tags,
+        images: question.images,
       },
       expiresAt,
     });
