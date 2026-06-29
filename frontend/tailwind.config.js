@@ -61,5 +61,7 @@ export default {
       backdropBlur: { xs: '2px' }
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }

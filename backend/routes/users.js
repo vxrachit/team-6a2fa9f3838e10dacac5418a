@@ -55,4 +55,35 @@ router.get('/my-queries', protect, async (req, res) => {
   }
 });
 
+router.patch('/change-password', protect, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current and new password are required' });
+    }
+    const user = await User.findById(req.user._id).select('+password');
+    if (!(await user.comparePassword(currentPassword))) {
+      return res.status(400).json({ error: 'Incorrect current password' });
+    }
+    user.password = newPassword;
+    await user.save();
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      const msg = Object.values(err.errors).map(e => e.message).join(', ');
+      return res.status(400).json({ error: msg });
+    }
+    res.status(500).json({ error: 'Failed to change password.' });
+  }
+});
+
+router.delete('/withdraw', protect, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user._id);
+    res.json({ message: 'Account deleted permanently.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete account.' });
+  }
+});
+
 module.exports = router;
