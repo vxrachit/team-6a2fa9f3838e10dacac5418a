@@ -9,6 +9,8 @@ import {
 import { useAuthStore } from '../store'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 const EXPLAIN_MODES = [
   { value: 'beginner', label: '🟢 Beginner', desc: 'Simple, step-by-step' },
@@ -391,7 +393,7 @@ export default function AskAI() {
           <motion.div ref={resultRef} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
             className="space-y-4">
             {/* Answer Card */}
-            <div className="card-dark border-blue-500/15">
+            <div className="bg-gradient-to-b from-dark-700/80 to-dark-800/90 backdrop-blur-md border border-blue-500/30 shadow-2xl shadow-blue-900/20 rounded-2xl overflow-hidden">
               {/* Header */}
               <div className="flex items-start justify-between p-5 pb-0">
                 <div className="flex items-center gap-2.5">
@@ -434,9 +436,11 @@ export default function AskAI() {
               </div>
 
               {/* Answer */}
-              <div className="p-5">
-                <div className="prose prose-invert prose-sm max-w-none">
-                  <p className="text-slate-200 leading-relaxed whitespace-pre-wrap">{result.answer}</p>
+              <div className="p-6 bg-blue-950/10 border-t border-b border-blue-500/10 mt-3">
+                <div className="prose prose-invert prose-sm sm:prose-base max-w-none">
+                  <div className="text-slate-100 font-medium leading-relaxed tracking-wide">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{result.answer}</ReactMarkdown>
+                  </div>
                   {/*  NEW INJECTION: Rendering the AI Feedback UI directly below the answer */}
                   <MessageFeedback
                     message={{ question: result.question, text: result.answer }}

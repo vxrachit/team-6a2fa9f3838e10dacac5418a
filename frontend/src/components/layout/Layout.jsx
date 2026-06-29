@@ -15,7 +15,6 @@ const navItems = [
   { to: '/discussions', icon: MessagesSquare, label: 'Discussions', desc: 'Community Q&A' },
   { to: '/faq', icon: BookOpen, label: 'FAQ Browser', desc: 'Browse knowledge base' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics', desc: 'Confusion insights' },
-  { to: '/announcements', icon: Bell, label: 'Announcements', desc: 'Important notices' },
 ]
 
 const bottomItems = [
@@ -156,6 +155,14 @@ export default function Layout() {
           </button>
 
           <div className="flex-1" />
+
+          <button onClick={() => navigate('/announcements')}
+            className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-dark-600 transition-colors relative"
+            title="Announcements">
+            <Bell size={18} />
+            {/* Optional dot indicator for unread announcements */}
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+          </button>
 
           <button onClick={toggleTheme}
             className="p-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-dark-600 transition-colors">

@@ -1,17 +1,56 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore, useThemeStore } from '../store';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 export default function Settings() {
-  const { user, updatePreferences } = useAuthStore();
+  const { user, updatePreferences, logout } = useAuthStore();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useThemeStore();
   const [isLoading, setIsLoading] = useState(false);
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   const [preferences, setPreferences] = useState({
     theme: 'system',
     explainMode: 'intermediate',
     notifications: true
   });
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword) return toast.error('Please fill in both fields');
+    setIsLoading(true);
+    try {
+      await api.patch('/users/change-password', { currentPassword, newPassword });
+      toast.success('Password changed successfully');
+      setCurrentPassword('');
+      setNewPassword('');
+      setIsChangingPassword(false);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to change password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (window.confirm('Are you sure you want to withdraw from the internship and permanently delete your account? This action cannot be undone.')) {
+      setIsLoading(true);
+      try {
+        await api.delete('/users/withdraw');
+        toast.success('Account permanently deleted');
+        logout();
+        navigate('/login');
+      } catch (err) {
+        toast.error('Failed to delete account');
+        setIsLoading(false);
+      }
+    }
+  };
 
   const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -178,24 +217,32 @@ export default function Settings() {
             <h2 className="text-xl font-bold text-slate-100 mb-6">Privacy & Security</h2>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-700">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-200">Change Password</h3>
-                  <p className="text-sm text-slate-400 mt-1">Update your account password regularly</p>
+              <div className="pb-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-200">Change Password</h3>
+                    <p className="text-sm text-slate-400 mt-1">Update your account password regularly</p>
+                  </div>
+                  <button onClick={() => setIsChangingPassword(!isChangingPassword)} className="px-4 py-2 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors">
+                    {isChangingPassword ? 'Cancel' : 'Change'}
+                  </button>
                 </div>
-                <button className="px-4 py-2 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors">
-                  Change
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-200">Two-Factor Authentication</h3>
-                  <p className="text-sm text-slate-400 mt-1">Add an extra layer of security</p>
-                </div>
-                <button className="px-4 py-2 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors">
-                  Enable
-                </button>
+                
+                {isChangingPassword && (
+                  <form onSubmit={handleChangePassword} className="space-y-4 mt-4 bg-dark-600/30 p-4 rounded-lg">
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1">Current Password</label>
+                      <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className="w-full bg-dark-700 border border-slate-600 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-blue-500" required />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-slate-400 mb-1">New Password</label>
+                      <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full bg-dark-700 border border-slate-600 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-blue-500" required />
+                    </div>
+                    <button type="submit" disabled={isLoading} className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-50">
+                      Save Password
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
           </div>
@@ -205,14 +252,8 @@ export default function Settings() {
             <h2 className="text-xl font-bold text-slate-100 mb-6">Account</h2>
             
             <div className="space-y-3">
-              <button className="w-full px-4 py-3 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors text-left font-medium">
-                📥 Download Your Data
-              </button>
-              <button className="w-full px-4 py-3 bg-dark-600 hover:bg-dark-500 text-slate-200 rounded-lg transition-colors text-left font-medium">
-                🔒 Deactivate Account
-              </button>
-              <button className="w-full px-4 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors text-left font-medium">
-                ⚠️ Delete Account Permanently
+              <button onClick={handleDeleteAccount} disabled={isLoading} className="w-full px-4 py-3 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition-colors text-left font-medium disabled:opacity-50">
+                ⚠️ Withdraw from internship and permanently delete your account
               </button>
             </div>
           </div>
