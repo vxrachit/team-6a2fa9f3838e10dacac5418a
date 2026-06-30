@@ -278,7 +278,7 @@ export default function Layout() {
                     )}
                   </div>
 
-                  <div className="overflow-y-auto" style="max-height: 380px">
+                  <div className="overflow-y-auto" style={{ maxHeight: '380px' }}>
                     {notifLoading ? (
                       <div className="p-4 space-y-3">
                         {[0,1,2].map(i => <div key={i} className="skeleton h-12 rounded-lg" />)}
