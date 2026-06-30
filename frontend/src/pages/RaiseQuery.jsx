@@ -106,7 +106,7 @@ export default function RaiseQuery() {
             className="space-y-5">
             {/* Title */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-2 block">Question title *</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Question title *</label>
               <div className="flex gap-2">
                 <input value={form.title} onChange={e => { setForm(f => ({ ...f, title: e.target.value })); setRefined(null) }}
                   className="input-dark flex-1" placeholder="What is your question? Be specific." />
@@ -139,7 +139,7 @@ export default function RaiseQuery() {
 
             {/* Category */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-3 block">Category *</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-3 block">Category *</label>
               <div className="grid grid-cols-3 gap-2">
                 {CATEGORIES.map(cat => (
                   <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))}
@@ -154,16 +154,16 @@ export default function RaiseQuery() {
 
             {/* Content */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-2 block">Describe your issue *</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-2 block">Describe your issue *</label>
               <textarea value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
                 className="input-dark resize-none" rows={5}
                 placeholder="Provide full context. What did you try? What error or confusion are you facing? The more specific, the better the AI answer will be." />
-              <p className="text-xs text-slate-600 mt-1.5">{form.content.length} characters · Be specific for better AI matching</p>
+              <p className="text-xs text-slate-500 mt-1.5">{form.content.length} characters · Be specific for better AI matching</p>
             </div>
 
             {/* Tags */}
             <div className="card-dark p-5">
-              <label className="text-sm font-medium text-slate-300 mb-3 block">Tags (optional)</label>
+              <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-3 block">Tags (optional)</label>
               <div className="flex flex-wrap gap-2 mb-3">
                 {form.tags.map(tag => (
                   <span key={tag} className="badge-category flex items-center gap-1">

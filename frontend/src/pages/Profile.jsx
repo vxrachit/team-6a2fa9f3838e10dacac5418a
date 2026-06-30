@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useAuthStore } from '../store';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
@@ -55,7 +56,7 @@ export default function Profile() {
         <div className="card-dark p-6 md:p-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 pb-6 border-b border-dark-500/50">
             <div className="flex items-center gap-5 mb-4 md:mb-0">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-violet-500 rounded-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold flex-shrink-0">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-violet-500 rounded-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold flex-shrink-0 shadow-lg ring-2 ring-blue-500/20 dark:ring-blue-500/20">
                 {user.name?.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -72,16 +73,13 @@ export default function Profile() {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { label: 'Queries Raised', value: stats.queriesRaised },
-              { label: 'Answers Given', value: stats.answersGiven },
-              { label: 'Bookmarks', value: stats.bookmarks },
-              { label: 'Reputation', value: stats.reputation },
-            ].map(s => (
-              <div key={s.label} className="card-dark p-4 text-center preference-card">
+            {[{ label: 'Queries Raised', value: stats.queriesRaised }, { label: 'Answers Given', value: stats.answersGiven }, { label: 'Bookmarks', value: stats.bookmarks }, { label: 'Reputation', value: stats.reputation }].map((s, i) => (
+              <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1, duration: 0.3 }}
+                className="card-dark card-hover p-4 text-center preference-card">
                 <p className="text-2xl font-bold dark:text-white text-slate-900">{s.value}</p>
-                <p className="text-xs dark:text-slate-500 text-slate-600 mt-1">{s.label}</p>
-              </div>
+                <p className="text-xs dark:text-slate-400 text-slate-400 mt-1">{s.label}</p>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -97,7 +95,7 @@ export default function Profile() {
                 { name: 'batch', label: 'Batch Year', placeholder: 'e.g. 2024' },
               ].map(f => (
                 <div key={f.name}>
-                  <label className="text-sm text-slate-400 mb-1.5 block">{f.label}</label>
+                  <label className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-1.5 block">{f.label}</label>
                   <input type="text" name={f.name} value={formData[f.name]}
                     onChange={e => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))}
                     className="input-dark" placeholder={f.placeholder} />

@@ -87,7 +87,7 @@ export default function Home() {
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="max-w-2xl mx-auto relative">
           <div className="relative">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder='Ask anything — "NOC deadline", "videos repeating", "offer letter format"...'
               className="input-dark pl-11 pr-32 py-4 text-base rounded-2xl border-dark-400 focus:border-blue-500/60" />
@@ -133,8 +133,8 @@ export default function Home() {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
               </div>
               {loadingInsight
-                ? <div className="text-slate-300"><TypingDots /></div>
-                : <p className="text-slate-200">{insight?.insight}</p>}
+                ? <div className="dark:text-slate-300 text-slate-600"><TypingDots /></div>
+                : <p className="dark:text-slate-200 text-slate-700">{insight?.insight}</p>}
               {insight?.trendingCategories?.length > 0 && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {insight.trendingCategories.map(c => (
@@ -211,7 +211,7 @@ export default function Home() {
         </div>
         <div className="card-dark misconception-card border-amber-500/10 divide-dark-500/50">
           {MISCONCEPTIONS.map((m, i) => (
-            <div key={i} className="p-4 flex items-start gap-3 hover:bg-dark-600/30 transition-colors">
+            <div key={i} className="p-4 flex items-start gap-3 dark:hover:bg-dark-600/30 hover:bg-slate-100/60 transition-colors">
               <AlertCircle size={14} className="text-amber-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{m.text}</p>

@@ -59,7 +59,7 @@ function QueryCard({ query, onClick }) {
           <h3 className="font-medium discussions-title transition-colors line-clamp-2 mb-2 dark:text-slate-200 text-slate-700">
             {query.refinedTitle || query.title}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-500 text-slate-500 line-clamp-2">{query.content?.substring(0, 120)}...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-500 line-clamp-2">{query.content?.substring(0, 120)}...</p>
         </div>
         {query.aiAnswer?.confidence && (
           <div className="flex-shrink-0">
@@ -168,10 +168,10 @@ export default function Discussions() {
 
       {/* Search */}
       <form onSubmit={handleSearch} className="relative mb-5">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search discussions..."
-          className="input-dark pl-10 pr-24" />
+          className="input-dark pl-11 pr-24" />
         <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-3 text-sm">
           Search
         </button>
@@ -230,7 +230,7 @@ export default function Discussions() {
               <div className="text-center py-20 card-dark">
                 <MessagesSquare size={40} className="text-slate-300 dark:text-slate-300 text-slate-400 mx-auto mb-4" />
                 <p className="text-slate-400 dark:text-slate-400 text-slate-500 font-medium">No discussions found</p>
-                <p className="text-slate-600 dark:text-slate-600 text-slate-500 text-sm mt-1">Try adjusting your filters or be the first to ask!</p>
+                <p className="text-slate-500 text-sm mt-1">Try adjusting your filters or be the first to ask!</p>
                 <button onClick={() => navigate('/raise-query')} className="btn-primary mt-4 inline-flex items-center gap-2">
                   <Plus size={14} /> Raise a Query
                 </button>

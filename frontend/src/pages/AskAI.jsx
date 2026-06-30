@@ -178,13 +178,13 @@ export default function AskAI() {
           <textarea ref={textRef} value={question}
             onChange={e => setQuestion(e.target.value)} onKeyDown={handleKeyDown}
             placeholder="Ask about NOC, ViBe issues, Rosetta, team formation, offer letter... (Ctrl+Enter to send)"
-            className="input-dark min-h-[100px] resize-none pr-14 text-base" rows={3} />
+            className="input-dark min-h-[120px] resize-none pr-14 text-base" style={{ boxShadow: 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)' }} rows={3} />
           <button onClick={() => handleAsk()} disabled={loading || !question.trim()}
             className="absolute bottom-3 right-3 w-9 h-9 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg flex items-center justify-center transition-all hover:shadow-lg hover:shadow-blue-500/25">
             <Send size={16} className="text-white" />
           </button>
         </div>
-        <p className="text-xs text-slate-600 dark:text-slate-500 mt-2">Ctrl+Enter to ask · Your question is matched against 180+ FAQ entries before AI generates a response</p>
+        <p className="text-xs text-slate-500 mt-2">Ctrl+Enter to ask · Your question is matched against 180+ FAQ entries before AI generates a response</p>
       </div>
 
       {/* Loading */}

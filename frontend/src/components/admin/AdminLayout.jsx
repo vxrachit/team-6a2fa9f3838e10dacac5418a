@@ -41,15 +41,14 @@ export default function AdminLayout({ children }) {
           <p className="text-xs text-rose-400/60">You have full administrative access</p>
         </div>
         <button onClick={() => navigate('/home')}
-          className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors active:scale-95 px-3 py-1.5 rounded-lg hover:bg-slate-100">
+          className="flex items-center gap-1.5 text-xs dark:text-slate-500 text-slate-500 dark:hover:text-slate-700 hover:text-slate-900 transition-colors active:scale-95 px-3 py-1.5 rounded-lg dark:hover:bg-slate-800 hover:bg-slate-100">
           <ArrowLeft size={13} /> Back to App
         </button>
       </motion.div>
 
       {/* Admin Nav — sticky */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.05 }}
-        className="flex gap-2 flex-wrap sticky top-2 z-10 backdrop-blur-md p-1.5 rounded-2xl admin-topbar border-dark-500/30"
-        style={typeof document !== 'undefined' && document.body.classList.contains('dark') ? {} : { background: 'rgba(241,245,249,0.9)' }}>
+        className="flex gap-2 flex-wrap sticky top-2 z-10 backdrop-blur-md p-1.5 rounded-2xl admin-topbar dark:border-dark-500/30 border-slate-200/60">
         {adminNavItems.map(({ to, icon: Icon, label, end }) => (
           <NavLink key={to} to={to} end={end}
             className={({ isActive }) =>

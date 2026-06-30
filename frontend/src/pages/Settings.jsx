@@ -57,7 +57,7 @@ export default function Settings() {
           <h2 className="text-sm font-semibold dark:text-white text-slate-900 mb-4 flex items-center gap-2">
             <Sun size={14} className="text-amber-400" /> Appearance
           </h2>
-          <div className="flex items-center justify-between py-3 border-b border-dark-500/50">
+          <div className="flex items-center justify-between py-3 border-b dark:border-dark-500/50 border-slate-200/60">
             <div>
               <p className="text-sm font-medium dark:text-slate-200 text-slate-700">Dark Mode</p>
               <p className="text-xs text-slate-500 mt-0.5">Toggle between light and dark themes</p>
@@ -66,7 +66,7 @@ export default function Settings() {
               onClick={toggleTheme}
               disabled={isLoading}
               className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                theme === 'dark' ? 'bg-blue-600' : 'bg-slate-400'
+                theme === 'dark' ? 'bg-blue-600' : 'dark:bg-slate-400 bg-slate-400'
               } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <span
@@ -155,7 +155,7 @@ export default function Settings() {
               onClick={() => handlePreferenceChange('notifications', !preferences.notifications)}
               disabled={isLoading}
               className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                preferences.notifications ? 'bg-blue-600' : 'bg-slate-400'
+                preferences.notifications ? 'bg-blue-600' : 'dark:bg-slate-400 bg-slate-400'
               } ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <span
@@ -185,7 +185,7 @@ export default function Settings() {
             <span className="text-lg">🔒</span> Privacy & Security
           </h2>
           <div className="space-y-3">
-            <div className="flex items-center justify-between py-3 border-b border-dark-500/50">
+            <div className="flex items-center justify-between py-3 border-b dark:border-dark-500/50 border-slate-200/60">
               <div>
                 <p className="text-sm font-medium dark:text-slate-200 text-slate-700">Change Password</p>
                 <p className="text-xs text-slate-500 mt-0.5">Update your account password regularly</p>

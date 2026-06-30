@@ -223,7 +223,7 @@ export default function Analytics() {
                     <span className="text-sm dark:text-slate-300 text-slate-700">{t._id}</span>
                     <span className="text-xs text-slate-500">{t.count} queries</span>
                   </div>
-                  <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
+                  <div className="h-2 dark:bg-dark-600 bg-slate-200 rounded-full overflow-hidden">
                     <motion.div initial={{ width: 0 }} animate={{ width: `${(t.count / (trending.trending[0]?.count || 1)) * 100}%` }}
                       transition={{ delay: 0.6 + i * 0.1 }}
                       className="h-full rounded-full"
@@ -246,7 +246,7 @@ export default function Analytics() {
           <p className="text-xs text-slate-500 mb-4">These questions have no answers yet. Consider adding FAQ entries for these topics.</p>
           <div className="space-y-2">
             {gaps.unanswered.map((q, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 bg-dark-700 rounded-xl border border-dark-500/50">
+              <div key={i} className="flex items-center gap-3 p-3 dark:bg-dark-700 bg-white rounded-xl dark:border-dark-500/50 border-slate-200/80">
                 <span className="badge-category">{q.category}</span>
                 <span className="text-sm dark:text-slate-300 text-slate-700 flex-1 truncate">{q.title}</span>
                 <span className="text-xs text-slate-600 flex items-center gap-1 flex-shrink-0">

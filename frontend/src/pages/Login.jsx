@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 
 function AuthLayout({ children, title, sub }) {
   return (
-    <div className="min-h-screen bg-dark-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen dark:bg-dark-900 bg-slate-100 flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl" />

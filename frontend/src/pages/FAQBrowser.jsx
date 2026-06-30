@@ -30,7 +30,7 @@ function FAQItem({ faq }) {
           <p className="text-sm font-medium dark:text-slate-200 text-slate-700">{faq.question}</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-slate-600 dark:text-slate-600 text-slate-500">{faq.usageCount} uses</span>
+          <span className="text-xs text-slate-500">{faq.usageCount} uses</span>
           {open ? <ChevronUp size={16} className="text-slate-500" /> : <ChevronDown size={16} className="text-slate-500" />}
         </div>
       </button>
@@ -40,7 +40,7 @@ function FAQItem({ faq }) {
           <p className="text-sm dark:text-slate-300 text-slate-700 leading-relaxed whitespace-pre-wrap">{faq.answer}</p>
           {faq.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {faq.tags.map(t => <span key={t} className="text-xs text-slate-600 dark:text-slate-600 text-slate-500 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>)}
+              {faq.tags.map(t => <span key={t} className="text-xs text-slate-500 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>)}
             </div>
           )}
         </motion.div>
@@ -87,9 +87,9 @@ export function FAQBrowser() {
       </div>
 
       <form onSubmit={handleSearch} className="relative mb-5">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search FAQs..." className="input-dark pl-10 pr-20" />
+          placeholder="Search FAQs..." className="input-dark pl-11 pr-20 text-sm" />
         <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-1.5 px-3 text-sm">Search</button>
       </form>
 
@@ -153,7 +153,7 @@ export function Announcements() {
             const pc = priorityConfig[ann.priority] || priorityConfig.general
             return (
               <motion.div key={ann._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className={`card-dark p-5 ${ann.isPinned ? 'border-amber-500/20' : ''}`}>
+                className={`card-dark card-hover p-5 ${ann.isPinned ? 'border-amber-500/20' : ''}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -167,7 +167,7 @@ export function Announcements() {
                         ⏰ Deadline: {new Date(ann.deadline).toLocaleDateString()}
                       </p>
                     )}
-                    <p className="text-xs text-slate-600 dark:text-slate-600 text-slate-500 mt-3">{new Date(ann.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-slate-500 mt-3">{new Date(ann.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               </motion.div>
