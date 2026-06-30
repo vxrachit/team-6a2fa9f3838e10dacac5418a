@@ -123,56 +123,113 @@ export function Announcements() {
     api.get('/announcements').then(r => setAnnouncements(Array.isArray(r.data) ? r.data : r.data?.announcements || [])).catch(() => {}).finally(() => setLoading(false))
   }, [])
 
+  const pinned = announcements.filter(a => a.isPinned)
+  const regular = announcements.filter(a => !a.isPinned)
+
   const priorityConfig = {
-    urgent: { class: 'bg-rose-500/15 text-rose-400 border-rose-500/20', label: '🚨 Urgent' },
-    important: { class: 'bg-amber-500/15 text-amber-400 border-amber-500/20', label: '⚠️ Important' },
-    general: { class: 'bg-blue-500/15 text-blue-400 border-blue-500/20', label: '📢 General' },
+    urgent: { cls: 'bg-rose-500/15 text-rose-400 border-rose-500/20', label: 'Urgent' },
+    important: { cls: 'bg-amber-500/15 text-amber-400 border-amber-500/20', label: 'Important' },
+    general: { cls: 'bg-blue-500/15 text-blue-400 border-blue-500/20', label: 'General' },
+  }
+
+  function AnnCard({ ann, index }) {
+    const pc = priorityConfig[ann.priority] || priorityConfig.general
+    return (
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05, duration: 0.25 }}
+        className={`card-dark card-hover p-5 relative overflow-hidden group ${ann.isPinned ? 'border-amber-500/20' : ''} ${!ann.isRead ? 'ring-1 ring-blue-500/10' : ''}`}>
+        {!ann.isRead && (
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 to-violet-500 rounded-full" />
+        )}
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0 pl-2">
+            <div className="flex flex-wrap items-center gap-2 mb-2.5">
+              <span className={`text-[11px] border px-2.5 py-0.5 rounded-full font-semibold ${pc.cls}`}>{pc.label}</span>
+              {ann.isPinned && (
+                <span className="text-[11px] text-amber-400 flex items-center gap-1">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 4h2a2 2 0 0 1 2 2v1l-6 5-1-1.5L16 4zm-8 0v14l-2-2-1 1.5-6-5V6a2 2 0 0 1 2-2h2v14a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V4h2a2 2 0 0 1 2 2v1.5l-6 5-4-4z"/></svg>
+                  Pinned
+                </span>
+              )}
+            </div>
+            <h3 className="font-semibold dark:text-white text-slate-900 mb-1.5 leading-snug">{ann.title}</h3>
+            <p className="text-sm dark:text-slate-400 text-slate-500 leading-relaxed line-clamp-2">{ann.content}</p>
+            <div className="flex items-center gap-3 mt-3 flex-wrap">
+              {ann.deadline && (
+                <span className="text-[11px] text-rose-400 flex items-center gap-1">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                  Due {new Date(ann.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              )}
+              <span className="text-[11px] dark:text-slate-600 text-slate-400">
+                {new Date(ann.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    )
   }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center">
-          <ExternalLink size={20} className="text-white" />
+      <div className="flex items-center gap-3.5 mb-8">
+        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-rose-600 to-orange-600 flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
         </div>
         <div>
           <h1 className="text-xl font-bold dark:text-white text-slate-900">Announcements</h1>
-          <p className="text-sm text-slate-500">Important notices from the Vicharanashala team</p>
+          <p className="text-sm dark:text-slate-500 text-slate-400">Important notices from the Vicharanashala team</p>
         </div>
       </div>
 
       {loading ? (
-        <div className="space-y-3">{Array(4).fill(0).map((_, i) => <div key={i} className="card-dark h-24 animate-pulse" />)}</div>
+        <div className="space-y-4">
+          {[0,1,2,3].map(i => (
+            <div key={i} className="card-dark p-5">
+              <div className="flex flex-col gap-3">
+                <div className="skeleton h-3 w-24 rounded-full" />
+                <div className="skeleton h-5 w-3/4 rounded" />
+                <div className="skeleton h-4 w-full rounded" />
+                <div className="skeleton h-4 w-2/3 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : announcements.length === 0 ? (
-        <div className="card-dark p-12 text-center">
-          <p className="text-slate-500">No announcements yet. Check back later.</p>
+        <div className="card-dark p-16 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-dark-700 flex items-center justify-center mx-auto mb-4">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="dark:text-slate-600 text-slate-300"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+          </div>
+          <p className="text-base font-medium dark:text-slate-400 text-slate-600 mb-1">No announcements yet</p>
+          <p className="text-sm dark:text-slate-600 text-slate-400">Check back later for important updates</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {announcements.map(ann => {
-            const pc = priorityConfig[ann.priority] || priorityConfig.general
-            return (
-              <motion.div key={ann._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className={`card-dark card-hover p-5 ${ann.isPinned ? 'border-amber-500/20' : ''}`}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className={`text-xs border px-2.5 py-0.5 rounded-full font-medium ${pc.class}`}>{pc.label}</span>
-                      {ann.isPinned && <span className="text-xs text-amber-400">📌 Pinned</span>}
-                    </div>
-                    <h3 className="font-semibold dark:text-white text-slate-900 mb-2">{ann.title}</h3>
-                    <p className="text-sm text-slate-400 dark:text-slate-400 text-slate-600 leading-relaxed">{ann.content}</p>
-                    {ann.deadline && (
-                      <p className="text-xs text-rose-400 dark:text-rose-400 text-rose-600 mt-2 flex items-center gap-1">
-                        ⏰ Deadline: {new Date(ann.deadline).toLocaleDateString()}
-                      </p>
-                    )}
-                    <p className="text-xs text-slate-500 mt-3">{new Date(ann.createdAt).toLocaleDateString()}</p>
-                  </div>
+        <div className="space-y-6">
+          {pinned.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[11px] font-bold uppercase tracking-widest dark:text-amber-400/70 text-amber-600">Pinned</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-amber-500/30 to-transparent" />
+              </div>
+              <div className="space-y-3">
+                {pinned.map((ann, i) => <AnnCard key={ann._id} ann={ann} index={i} />)}
+              </div>
+            </div>
+          )}
+          {regular.length > 0 && (
+            <div>
+              {pinned.length > 0 && (
+                <div className="flex items-center gap-2 mb-3 mt-6">
+                  <span className="text-[11px] font-bold uppercase tracking-widest dark:text-slate-500 text-slate-400">Latest</span>
+                  <div className="flex-1 h-px bg-gradient-to-r from-slate-300/40 to-transparent dark:from-slate-700/40 to-transparent" />
                 </div>
-              </motion.div>
-            )
-          })}
+              )}
+              <div className="space-y-3">
+                {regular.map((ann, i) => <AnnCard key={ann._id} ann={ann} index={pinned.length + i} />)}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

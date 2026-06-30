@@ -32,18 +32,19 @@ export default function AdminLayout({ children }) {
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
       {/* Admin Banner */}
       <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3 p-3 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
-        <div className="w-9 h-9 rounded-xl bg-rose-500/20 flex items-center justify-center flex-shrink-0">
-          <Shield size={16} className="text-rose-400" />
+        className="flex items-center gap-3 p-4 rounded-2xl border border-rose-500/20 bg-gradient-to-r from-rose-500/8 to-violet-500/8 dark:from-rose-500/10 dark:to-violet-500/10 backdrop-blur-sm">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-violet-500/20 border border-rose-500/20 flex items-center justify-center flex-shrink-0 shadow-lg shadow-rose-500/10">
+          <Shield size={18} className="text-rose-400" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-rose-300">Admin Panel</p>
-          <p className="text-xs text-rose-400/60">You have full administrative access</p>
+          <p className="text-sm font-bold dark:text-rose-300 text-rose-600">Admin Panel</p>
+          <p className="text-xs dark:text-rose-400/60 text-rose-400/70">You have full administrative access</p>
         </div>
-        <button onClick={() => navigate('/home')}
-          className="flex items-center gap-1.5 text-xs dark:text-slate-500 text-slate-500 dark:hover:text-slate-700 hover:text-slate-900 transition-colors active:scale-95 px-3 py-1.5 rounded-lg dark:hover:bg-slate-800 hover:bg-slate-100">
+        <motion.button whileHover={{ x: -3 }} whileTap={{ scale: 0.97 }}
+          onClick={() => navigate('/home')}
+          className="flex items-center gap-1.5 text-xs font-medium dark:text-slate-400 text-slate-500 dark:hover:text-slate-900 hover:text-slate-900 transition-colors px-3 py-1.5 rounded-lg dark:bg-slate-700/60 bg-slate-100/80 border dark:border-dark-500/50 border-slate-200/80 hover:dark:bg-slate-100 hover:bg-slate-200/80">
           <ArrowLeft size={13} /> Back to App
-        </button>
+        </motion.button>
       </motion.div>
 
       {/* Admin Nav — sticky */}
