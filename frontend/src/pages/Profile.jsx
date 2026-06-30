@@ -54,7 +54,7 @@ export default function Profile() {
 
         {/* Profile Card */}
         <div className="card-dark p-6 md:p-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 pb-6 border-b border-dark-500/50">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 pb-6 border-b dark:border-dark-500/50 border-slate-200/60">
             <div className="flex items-center gap-5 mb-4 md:mb-0">
               <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-violet-500 rounded-full flex items-center justify-center text-white text-2xl md:text-3xl font-bold flex-shrink-0 shadow-lg ring-2 ring-blue-500/20 dark:ring-blue-500/20">
                 {user.name?.charAt(0).toUpperCase()}

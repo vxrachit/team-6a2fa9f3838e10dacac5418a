@@ -90,7 +90,7 @@ export default function Home() {
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-400 text-slate-500 pointer-events-none" />
             <input type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder='Ask anything — "NOC deadline", "videos repeating", "offer letter format"...'
-              className="input-dark pl-11 pr-32 py-4 text-base rounded-2xl border-dark-400 focus:border-blue-500/60" />
+              className="input-dark pl-11 pr-32 py-4 text-base rounded-2xl border-slate-300 focus:border-blue-500/60" />
             <button type="submit"
               className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-2 px-4 text-sm flex items-center gap-1.5">
               Ask AI <Brain size={14} />

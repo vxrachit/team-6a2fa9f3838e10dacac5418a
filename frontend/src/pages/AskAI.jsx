@@ -31,9 +31,9 @@ function ConfidenceBadge({ level, score }) {
 function SourceCard({ section, category, question, similarity }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="source-card border border-dark-500/50 rounded-xl overflow-hidden">
+    <div className="source-card rounded-xl overflow-hidden">
       <button onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-dark-600/50 transition-colors">
+        className="w-full flex items-center gap-3 px-4 py-3 text-left dark:hover:bg-dark-600/50 hover:bg-slate-100/70 transition-colors">
         <div className="w-7 h-7 rounded-lg bg-blue-500/15 flex items-center justify-center flex-shrink-0">
           <BookOpen size={13} className="text-blue-400" />
         </div>
@@ -49,7 +49,7 @@ function SourceCard({ section, category, question, similarity }) {
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }}
-            className="overflow-hidden source-hdr border-t border-dark-500/50">
+            className="overflow-hidden source-hdr border-t">
             <div className="px-4 py-3 source-card-body">
               <p className="text-sm font-medium dark:text-slate-300 text-slate-700 mb-1">{question}</p>
               <span className="badge-category">{category}</span>
@@ -274,7 +274,7 @@ export default function AskAI() {
               )}
 
               {/* Feedback */}
-              <div className="feedback-bar px-5 pb-5 flex items-center gap-3 border-t border-dark-500/50 pt-4">
+              <div className="feedback-bar px-5 pb-5 flex items-center gap-3 border-t pt-4">
                 <span className="text-xs text-slate-500 dark:text-slate-600">Was this helpful?</span>
                 {result.sourceDetails?.map(s => (
                   <div key={s.id} className="flex items-center gap-2">
