@@ -53,12 +53,12 @@ export default function Landing() {
               <Sparkles size={14} />
               Vicharanashala × IIT Ropar · Summership 2026
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold text-white dark:text-slate-900 mb-6 leading-tight tracking-tight">
               AI-Powered{' '}
               <span className="gradient-text">Internship</span>
               <br />Intelligence Platform
             </h1>
-            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-slate-400 dark:text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
               Reducing repetitive confusion through contextual AI assistance.
               Grounded in real FAQ data. Zero hallucinations. Built for 500+ interns.
             </p>
@@ -74,9 +74,9 @@ export default function Landing() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.6 }}
             className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
             {stats.map((s, i) => (
-              <div key={i} className="bg-dark-700/60 border border-dark-500/50 rounded-2xl p-4">
+              <div key={i} className="card-dark p-4">
                 <div className="text-3xl font-bold gradient-text mb-1">{s.value}</div>
-                <div className="text-sm text-slate-500">{s.label}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-600">{s.label}</div>
               </div>
             ))}
           </motion.div>
@@ -87,7 +87,7 @@ export default function Landing() {
       <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold text-white mb-4">Not a chatbot. An intelligence ecosystem.</h2>
+            <h2 className="text-3xl font-bold text-white dark:text-slate-900 mb-4">Not a chatbot. An intelligence ecosystem.</h2>
             <p className="text-slate-400 max-w-xl mx-auto">Every answer is retrieved from real FAQ data before Gemini generates a response. No guessing. No hallucinations.</p>
           </div>
           <div className="grid md:grid-cols-2 gap-5">
@@ -101,7 +101,7 @@ export default function Landing() {
                     <f.icon size={20} className={cfg.text} />
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{f.title}</h3>
-                  <p className="text-slate-400 text-sm leading-relaxed">{f.desc}</p>
+                  <p className="text-slate-400 dark:text-slate-600 text-sm leading-relaxed">{f.desc}</p>
                 </motion.div>
               )
             })}
@@ -110,10 +110,10 @@ export default function Landing() {
       </section>
 
       {/* RAG Flow */}
-      <section className="py-20 px-6 bg-dark-800/50">
+      <section className="py-20 px-6 bg-dark-800/50 dark:bg-slate-100">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">How the RAG pipeline works</h2>
-          <p className="text-slate-400 mb-12">Your question → FAQ retrieval → Gemini generation → Confident answer</p>
+          <h2 className="text-3xl font-bold text-white dark:text-slate-900 mb-4">How the RAG pipeline works</h2>
+          <p className="text-slate-400 dark:text-slate-600 mb-12">Your question → FAQ retrieval → Gemini generation → Confident answer</p>
           <div className="flex flex-col gap-2">
             {[
               { step: '01', title: 'You ask a question',       sub: 'Typed into the AI interface' },
@@ -124,11 +124,11 @@ export default function Landing() {
             ].map((item, i) => (
               <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }} viewport={{ once: true }}
-                className="flex items-center gap-5 bg-dark-700/60 border border-dark-500/50 rounded-xl p-4 text-left">
+                className="flex items-center gap-5 card-dark rounded-xl p-4 text-left">
                 <div className="text-2xl font-bold font-mono text-blue-500/40 flex-shrink-0 w-10">{item.step}</div>
                 <div>
-                  <div className="text-white font-medium">{item.title}</div>
-                  <div className="text-slate-500 text-sm">{item.sub}</div>
+                  <div className="text-white dark:text-slate-900 font-medium">{item.title}</div>
+                  <div className="text-slate-500 dark:text-slate-600 text-sm">{item.sub}</div>
                 </div>
               </motion.div>
             ))}
@@ -142,10 +142,10 @@ export default function Landing() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-center gap-2 mb-6">
             <Users size={20} className="text-slate-500" />
-            <span className="text-slate-500">500+ interns already using VINS</span>
+            <span className="text-slate-500 dark:text-slate-600">500+ interns already using VINS</span>
           </div>
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to get clear answers?</h2>
-          <p className="text-slate-400 mb-8">Join the platform that understands internship workflows, not just keywords.</p>
+          <h2 className="text-4xl font-bold text-white dark:text-slate-900 mb-6">Ready to get clear answers?</h2>
+          <p className="text-slate-400 dark:text-slate-600 mb-8">Join the platform that understands internship workflows, not just keywords.</p>
           <Link to="/signup" className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4">
             Get Started Free <ArrowRight size={18} />
           </Link>
