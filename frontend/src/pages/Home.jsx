@@ -53,9 +53,10 @@ export default function Home() {
         api.get('/queries/trending').catch(() => ({ data: [] })),
         api.get('/faq/categories').catch(() => ({ data: [] })),
       ])
-      setInsight(insightRes.data)
-      setTrending(trendingRes.data || [])
-      setCategoryStats(catRes.data || [])
+      // Normalize: handle both array responses and object wrappers like { queries: [...] }
+      setInsight(insightRes.data?.insight ? insightRes.data : { insight: insightRes.data })
+      setTrending(Array.isArray(trendingRes.data) ? trendingRes.data : (trendingRes.data?.queries || []))
+      setCategoryStats(Array.isArray(catRes.data) ? catRes.data : (catRes.data?.categories || []))
     } catch (e) {}
     setLoadingInsight(false)
   }
