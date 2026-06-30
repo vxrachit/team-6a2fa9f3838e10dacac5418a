@@ -7,6 +7,7 @@ import api from '../../utils/api'
 import toast from 'react-hot-toast'
 
 function EscalationRow({ query, onResolve, onAssign }) {
+  const navigate = useNavigate()
   const [expanded, setExpanded] = useState(false)
   const [assigning, setAssigning] = useState(false)
   const [mentors, setMentors] = useState([])
