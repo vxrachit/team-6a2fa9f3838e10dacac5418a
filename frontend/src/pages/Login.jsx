@@ -64,14 +64,14 @@ export function Login() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Error Display */}
         {localError && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-2">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+            className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-2 overflow-hidden">
             <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
               <span className="text-red-400 text-xs font-bold">!</span>
             </div>
             <p className="text-sm text-red-300">{localError}</p>
-          </div>
+          </motion.div>
         )}
-        
         <div>
           <label className="text-sm text-slate-400 mb-1.5 block">Email</label>
           <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
@@ -89,9 +89,10 @@ export function Login() {
             </button>
           </div>
         </div>
-        <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2 mt-2">
-          {isLoading ? <span className="flex gap-1"><span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" /></span>
-            : <><span>Sign In</span><ArrowRight size={16} /></>}
+        <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed group">
+          {isLoading
+            ? <span className="flex gap-1"><span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" /></span>
+            : <><span className="group-disabled:hidden">Sign In</span><ArrowRight size={16} className="group-disabled:hidden" /></>}
         </button>
       </form>
       <p className="text-center text-slate-500 text-sm mt-6">
@@ -139,12 +140,13 @@ export function Signup() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Error Display */}
         {localError && (
-          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-2">
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
+            className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex items-center gap-2 overflow-hidden">
             <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
               <span className="text-red-400 text-xs font-bold">!</span>
             </div>
             <p className="text-sm text-red-300">{localError}</p>
-          </div>
+          </motion.div>
         )}
 
         <div>
@@ -174,9 +176,29 @@ export function Signup() {
             </button>
           </div>
         </div>
-        <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2 mt-2">
-          {isLoading ? <span className="flex gap-1"><span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" /></span>
-            : <><span>Create Account</span><ArrowRight size={16} /></>}
+        {/* Password strength */}
+        {form.password && (
+          <div className="space-y-1">
+            <div className="flex gap-1">
+              {[1,2,3].map(i => (
+                <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-300 ${
+                  form.password.length >= i * 2
+                    ? i === 1 ? 'bg-rose-500' : i === 2 ? 'bg-amber-500' : 'bg-emerald-500'
+                    : 'bg-dark-500 dark:bg-slate-300'
+                }`} />
+              ))}
+            </div>
+            <p className={`text-xs transition-colors ${
+              form.password.length >= 10 ? 'text-emerald-400' : form.password.length >= 6 ? 'text-amber-400' : 'text-rose-400'
+            }`}>
+              {form.password.length < 6 ? 'Too short' : form.password.length < 10 ? 'Medium strength' : 'Strong password'}
+            </p>
+          </div>
+        )}
+        <button type="submit" disabled={isLoading} className="btn-primary w-full flex items-center justify-center gap-2 mt-2 disabled:opacity-60 disabled:cursor-not-allowed group">
+          {isLoading
+            ? <span className="flex gap-1"><span className="typing-dot" /><span className="typing-dot" /><span className="typing-dot" /></span>
+            : <><span className="group-disabled:hidden">Create Account</span><ArrowRight size={16} className="group-disabled:hidden" /></>}
         </button>
       </form>
       <p className="text-center text-slate-500 text-sm mt-6">

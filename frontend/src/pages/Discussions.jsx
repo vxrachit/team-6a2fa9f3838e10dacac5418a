@@ -37,9 +37,11 @@ function QueryCard({ query, onClick }) {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+    <div
       onClick={onClick}
-      className="card-dark card-hover p-5 cursor-pointer group">
+      className="card-dark card-hover p-5 cursor-pointer group relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/5">
+      {/* Accent bar — visible on hover */}
+      <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-l-xl" />
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -54,10 +56,10 @@ function QueryCard({ query, onClick }) {
               <span key={t} className="text-xs text-slate-500 px-2 py-0.5 rounded-full qa-tag">{t}</span>
             ))}
           </div>
-          <h3 className="font-medium discussions-title transition-colors line-clamp-2 mb-2 discussions-title">
+          <h3 className="font-medium discussions-title transition-colors line-clamp-2 mb-2 dark:text-slate-200 text-slate-700">
             {query.refinedTitle || query.title}
           </h3>
-          <p className="text-sm text-slate-500 line-clamp-2">{query.content?.substring(0, 120)}...</p>
+          <p className="text-sm text-slate-500 dark:text-slate-500 text-slate-500 line-clamp-2">{query.content?.substring(0, 120)}...</p>
         </div>
         {query.aiAnswer?.confidence && (
           <div className="flex-shrink-0">
@@ -84,7 +86,7 @@ function QueryCard({ query, onClick }) {
         <span className="flex items-center gap-1"><Bookmark size={11} /> {query.bookmarks || 0}</span>
         <span className="flex items-center gap-1 ml-auto"><Clock size={11} /> {timeAgo(query.createdAt)}</span>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -226,16 +228,23 @@ export default function Discussions() {
           : queries.length === 0
             ? (
               <div className="text-center py-20 card-dark">
-                <MessagesSquare size={40} className="text-slate-300 mx-auto mb-4" />
-                <p className="text-slate-400 font-medium">No discussions found</p>
-                <p className="text-slate-600 text-sm mt-1">Try adjusting your filters or be the first to ask!</p>
+                <MessagesSquare size={40} className="text-slate-300 dark:text-slate-300 text-slate-400 mx-auto mb-4" />
+                <p className="text-slate-400 dark:text-slate-400 text-slate-500 font-medium">No discussions found</p>
+                <p className="text-slate-600 dark:text-slate-600 text-slate-500 text-sm mt-1">Try adjusting your filters or be the first to ask!</p>
                 <button onClick={() => navigate('/raise-query')} className="btn-primary mt-4 inline-flex items-center gap-2">
                   <Plus size={14} /> Raise a Query
                 </button>
               </div>
             )
-            : queries.map(q => (
-              <QueryCard key={q._id} query={q} onClick={() => navigate(`/discussions/${q._id}`)} />
+            : queries.map((q, i) => (
+              <motion.div
+                key={q._id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.04, 0.3) }}
+              >
+                <QueryCard query={q} onClick={() => navigate(`/discussions/${q._id}`)} />
+              </motion.div>
             ))
         }
       </div>

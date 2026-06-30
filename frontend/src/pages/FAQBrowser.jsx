@@ -18,29 +18,29 @@ function FAQItem({ faq }) {
         className="w-full flex items-start gap-4 p-4 text-left hover:bg-dark-600/40 transition-colors">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            {faq.sectionId && <span className="text-xs font-mono text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">§{faq.sectionId}</span>}
+            {faq.sectionId && <span className="text-xs font-mono text-blue-400 dark:text-blue-400 text-blue-600 bg-blue-500/10 px-2 py-0.5 rounded">§{faq.sectionId}</span>}
             <span className="badge-category">{faq.category}</span>
             <span className={`text-xs px-2 py-0.5 rounded-full border font-medium capitalize ${
-              c === 'rose' ? 'bg-rose-500/10 text-rose-400 border-rose-500/20' :
-              c === 'amber' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-              c === 'blue' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-              'bg-slate-500/10 text-slate-400 border-slate-500/20'
+              c === 'rose' ? 'bg-rose-500/10 text-rose-400 dark:text-rose-400 text-rose-600 border-rose-500/20' :
+              c === 'amber' ? 'bg-amber-500/10 text-amber-400 dark:text-amber-400 text-amber-600 border-amber-500/20' :
+              c === 'blue' ? 'bg-blue-500/10 text-blue-400 dark:text-blue-400 text-blue-600 border-blue-500/20' :
+              'bg-slate-500/10 text-slate-400 dark:text-slate-400 text-slate-600 border-slate-500/20'
             }`}>{faq.importance}</span>
           </div>
-          <p className="text-sm font-medium text-slate-200">{faq.question}</p>
+          <p className="text-sm font-medium text-slate-200 dark:text-slate-200 text-slate-700">{faq.question}</p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs text-slate-600">{faq.usageCount} uses</span>
+          <span className="text-xs text-slate-600 dark:text-slate-600 text-slate-500">{faq.usageCount} uses</span>
           {open ? <ChevronUp size={16} className="text-slate-500" /> : <ChevronDown size={16} className="text-slate-500" />}
         </div>
       </button>
       {open && (
         <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }}
           className="border-t border-dark-500/50 px-4 py-4">
-          <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">{faq.answer}</p>
+          <p className="text-sm text-slate-300 dark:text-slate-300 text-slate-700 leading-relaxed whitespace-pre-wrap">{faq.answer}</p>
           {faq.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {faq.tags.map(t => <span key={t} className="text-xs text-slate-600 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>)}
+              {faq.tags.map(t => <span key={t} className="text-xs text-slate-600 dark:text-slate-600 text-slate-500 bg-dark-600 px-2 py-0.5 rounded-full">{t}</span>)}
             </div>
           )}
         </motion.div>
@@ -106,7 +106,7 @@ export function FAQBrowser() {
         {loading
           ? Array(8).fill(0).map((_, i) => <div key={i} className="card-dark h-14 animate-pulse" />)
           : faqs.length === 0
-            ? <div className="text-center py-16 text-slate-500">No FAQs found</div>
+            ? <div className="text-center py-16 text-slate-500 dark:text-slate-500 text-slate-500">No FAQs found</div>
             : faqs.map(faq => <FAQItem key={faq._id} faq={faq} />)
         }
       </div>
@@ -161,13 +161,13 @@ export function Announcements() {
                       {ann.isPinned && <span className="text-xs text-amber-400">📌 Pinned</span>}
                     </div>
                     <h3 className="font-semibold dark:text-white text-slate-900 mb-2">{ann.title}</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">{ann.content}</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-400 text-slate-600 leading-relaxed">{ann.content}</p>
                     {ann.deadline && (
-                      <p className="text-xs text-rose-400 mt-2 flex items-center gap-1">
+                      <p className="text-xs text-rose-400 dark:text-rose-400 text-rose-600 mt-2 flex items-center gap-1">
                         ⏰ Deadline: {new Date(ann.deadline).toLocaleDateString()}
                       </p>
                     )}
-                    <p className="text-xs text-slate-600 mt-3">{new Date(ann.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-600 text-slate-500 mt-3">{new Date(ann.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               </motion.div>
