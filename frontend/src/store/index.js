@@ -48,6 +48,9 @@ export const useAuthStore = create(
 
       updateUser: (user) => set({ user }),
 
+      updateBookmarkedQueries: (bookmarkedQueries) =>
+        set(state => ({ user: { ...state.user, bookmarkedQueries } })),
+
       initAuth: () => {
         const { token } = get();
         if (token) {

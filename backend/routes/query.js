@@ -50,6 +50,7 @@ router.get('/trending', async (req, res) => {
 // GET /api/queries/:id
 router.get('/:id', optionalAuth, async (req, res) => {
   try {
+    console.log('GET /:id req.params.id:', req.params.id, 'type:', typeof req.params.id)
     const query = await Query.findById(req.params.id)
       .populate('author', 'name role avatar phase college')
       .populate('relatedFAQs')
@@ -223,9 +224,23 @@ router.post('/:id/vote', protect, async (req, res) => {
   }
 });
 
+// GET /api/queries/bookmarked - Get current user's bookmarked queries
+router.get('/bookmarked', protect, async (req, res) => {
+  try {
+    const queries = await Query.find({ _id: { $in: req.user.bookmarkedQueries } })
+      .populate('author', 'name college phase')
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json({ queries });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch bookmarked queries.' });
+  }
+});
+
 // POST /api/queries/:id/bookmark
 router.post('/:id/bookmark', protect, async (req, res) => {
   try {
+    console.log('POST /:id/bookmark req.params.id:', req.params.id, 'type:', typeof req.params.id)
     const User = require('../models/User');
     const user = await User.findById(req.user._id);
     const qId = req.params.id;
@@ -244,6 +259,7 @@ router.post('/:id/bookmark', protect, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 
 // PATCH /api/queries/:id/escalate
 router.patch('/:id/escalate', protect, async (req, res) => {
